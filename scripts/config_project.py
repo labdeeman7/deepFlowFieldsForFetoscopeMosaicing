@@ -38,7 +38,7 @@ seq_exact = {
     "anon012": {
         "name": "anon006",
         "file_length": 100,
-        "start": 80,
+        "start": 351,
         "v_crop_top": 80,
         "v_crop_bottom": 70,
     }
@@ -83,7 +83,7 @@ seq_extra = {
     "anon012": {
         "name": "anon012",
         "file_length": 200,
-        "start": 81,
+        "start": 351,
         "v_crop_top": 80,
         "v_crop_bottom": 70,
     }
@@ -108,4 +108,5 @@ def get_img_paths(img_paths, seq_name, is_exact):
     img_paths = img_paths[start: start + file_length]
 
     return img_paths
+
 

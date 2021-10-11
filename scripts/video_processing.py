@@ -13,7 +13,56 @@ image_folder_path = args.image_folder_path
 video_path = args.video_path
 video_frames_path = args.video_frames_path
 
-def generate_video(image_folder, video_name, video_frames_path):
+dim = (400, 400)
+
+#tuple of the form (x,y,w,h)
+crop_params_extra = {
+    "anon001": (2270, 2367, 1177, 800),
+    "anon003": (2109, 2385, 1045, 1314),
+    "anon005": (1941, 2410, 1210, 2334)
+}
+
+crop_params_exact = {
+    "anon001": {    
+        "x"   : 351,
+        "y"   : 846,
+        "w"   : 1136,
+        "h"   : 819,
+    },
+    "anon002": {    
+        "x"   : 410,
+        "y"   : 811,
+        "w"   : 1106,
+        "h"   : 1462,
+    },
+    "anon003": {    
+        "x"   : 983,
+        "y"   : 938,
+        "w"   : 785,
+        "h"   : 509,
+    },
+    "anon005": {      
+        "x"   : 1225,
+        "y"   : 590,
+        "w"   : 934,
+        "h"   : 1791,
+    },
+    "anon010": {       
+        "x"   : 701,
+        "y"   : 635,
+        "w"   : 765,
+        "h"   : 821,
+    },
+    "anon012": {    
+        
+        "x"   : 562,
+        "y"   : 689,
+        "w"   : 907,
+        "h"   : 792,
+    }
+}
+
+def generate_video(image_folder, video_name):
     """
     Generate videos from warped images with lots of paddings.
     :param image_folder: folder path
@@ -29,22 +78,25 @@ def generate_video(image_folder, video_name, video_frames_path):
 
     images.sort()
 
-    print(images)
-
     frame = cv2.imread(os.path.join(image_folder, images[0]))
 
-    height, width, layers = frame.shape
+    height, width, _ = frame.shape
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    video = cv2.VideoWriter(video_name, fourcc, 1, (width, height))
+    video = cv2.VideoWriter(video_name, fourcc, 8, (dim[0], dim(1)))
 
-    # Appending the images to the video one by one
     video_frame = np.zeros((height, width, 3), np.uint8)
     for image in images:
         img = cv2.imread(os.path.join(image_folder, image), cv2.IMREAD_UNCHANGED)
         video_frame = overlay_transparent(video_frame, img)
-        cv2.imwrite(os.path.join(video_frames_path, image), video_frame)
-        video.write(video_frame)
+        x,y,w,h= crop_params_extra["anon001"]
+        video_frame = video_frame[y:y+h, x:x+w]
+
+        # cv2.imwrite(os.path.join(video_frames_path, image), video_frame)
+
+        # resize image
+        resized_video_frame = cv2.resize(video_frame, dim, interpolation = cv2.INTER_AREA)
+        video.write(resized_video_frame)
 
         # Deallocating memories taken for window creation
     cv2.destroyAllWindows()
@@ -77,21 +129,7 @@ def overlay_transparent(bg_img, img_to_overlay_t):
     return bg_img
 
 
-def get_square_in_image(image, squareLength=2000):
-    """
-    The padding in the image is too large, need to reduce this padding so video is very clear.
-     need to change squarelength from videosequence to videosequence
-    :param image: image to crop
-    :param squareLength:  crop size
-    :return: cropped image
-    """
-    h_start = int((image.shape[0] - squareLength) / 2)
-    w_start = int((image.shape[1] - squareLength) / 2)
-
-    crop_img = image[h_start:h_start + squareLength, w_start:w_start + squareLength, :, :]
-    return crop_img
-
 
 # Calling the generate_video function
-generate_video(image_folder_path, video_path, video_frames_path)
+generate_video(image_folder_path, video_path)
 
